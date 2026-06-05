@@ -1,4 +1,4 @@
-# Auto Cut Tool
+# GPT Image Tool
 
 AI-driven image cutting and background removal tool with cross-platform GUI support (Windows & macOS).
 
@@ -47,7 +47,7 @@ bun run tauri build
 ## Project Structure
 
 ```
-auto-cut-tool/
+GPT-image-tool/
 ├── src-tauri/          # Rust backend
 │   ├── src/
 │   │   ├── main.rs     # Entry point

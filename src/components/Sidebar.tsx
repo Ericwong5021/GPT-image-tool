@@ -17,7 +17,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       <div className="p-4 border-b border-gray-200">
         <h1 className="text-lg font-bold text-gray-800 flex items-center gap-2">
           <span className="text-2xl">✂️</span>
-          Auto Cut Tool
+          GPT Image Tool
         </h1>
         <p className="text-xs text-gray-500 mt-1">自动切图工具</p>
       </div>

@@ -34,7 +34,7 @@ impl Default for AppConfig {
 impl AppConfig {
     pub fn config_path() -> PathBuf {
         let mut path = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
-        path.push("auto-cut-tool");
+        path.push("gpt-image-tool");
         std::fs::create_dir_all(&path).ok();
         path.push("config.json");
         path
