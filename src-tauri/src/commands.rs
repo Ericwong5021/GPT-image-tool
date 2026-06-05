@@ -54,17 +54,6 @@ pub fn process_image(
         result_img = img_proc::crop_image(&result_img, w, h);
     }
 
-    let mut slice_paths: Vec<String> = Vec::new();
-    if options.auto_slice {
-        let slices = img_proc::auto_slice(&result_img, config.slice_sensitivity);
-        for (i, slice) in slices.iter().enumerate() {
-            let slice_path = format!("{}/{}_slice_{}.{}", out_dir, input_name, i, ext);
-            let slice_encoded = img_proc::encode_image(slice, &options.output_format)?;
-            std::fs::write(&slice_path, &slice_encoded).map_err(|e| e.to_string())?;
-            slice_paths.push(slice_path);
-        }
-    }
-
     let out_dir = output_dir
         .or(config.output_dir.clone())
         .unwrap_or_else(|| {
@@ -84,6 +73,17 @@ pub fn process_image(
         "jpg" | "jpeg" => "jpg",
         _ => "png",
     };
+
+    let mut slice_paths: Vec<String> = Vec::new();
+    if options.auto_slice {
+        let slices = img_proc::auto_slice(&result_img, config.slice_sensitivity);
+        for (i, slice) in slices.iter().enumerate() {
+            let slice_path = format!("{}/{}_slice_{}.{}", out_dir, input_name, i, ext);
+            let slice_encoded = img_proc::encode_image(slice, &options.output_format)?;
+            std::fs::write(&slice_path, &slice_encoded).map_err(|e| e.to_string())?;
+            slice_paths.push(slice_path);
+        }
+    }
 
     let output_path = format!("{}/{}_processed.{}", out_dir, input_name, ext);
     let encoded = img_proc::encode_image(&result_img, &options.output_format)?;
