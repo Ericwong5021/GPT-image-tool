@@ -1,12 +1,12 @@
 [package]
-name = "auto-cut-tool"
+name = "gpt-image-tool"
 version = "0.1.0"
-description = "AI-driven image cutting and background removal tool"
-authors = ["Auto Cut Tool"]
+description = "GPT Image Tool - AI-driven image cutting and background removal tool"
+authors = ["GPT Image Tool"]
 edition = "2021"
 
 [lib]
-name = "auto_cut_tool_lib"
+name = "gpt_image_tool_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

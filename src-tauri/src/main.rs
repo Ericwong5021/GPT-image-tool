@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    auto_cut_tool_lib::run()
+    gpt_image_tool_lib::run()
 }

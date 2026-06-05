@@ -1,5 +1,5 @@
 {
-  "name": "auto-cut-tool",
+  "name": "gpt-image-tool",
   "version": "0.1.0",
   "description": "AI-driven image cutting and background removal tool",
   "private": true,
