@@ -55,7 +55,7 @@ export function useImageProcess() {
         const img = pending[i];
         setImages((prev) =>
           prev.map((item) =>
-            item.id === img.id ? { ...item, status: "processing" } : item,
+            item.id === img.id ? { ...item, status: "processing" as const } : item,
           ),
         );
         setProgress({ current: i + 1, total: pending.length });
