@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import {
   processImage,
+  batchProcess,
   type ProcessOptions,
   type ProcessResult,
 } from "../lib/tauri";
@@ -51,45 +52,50 @@ export function useImageProcess() {
       const pending = images.filter((i) => i.status === "pending");
       setProgress({ current: 0, total: pending.length });
 
-      for (let i = 0; i < pending.length; i++) {
-        const img = pending[i];
+      // Mark all as processing
+      setImages((prev) =>
+        prev.map((item) =>
+          item.status === "pending" ? { ...item, status: "processing" as const } : item,
+        ),
+      );
+
+      try {
+        const paths = pending.map((img) => img.path);
+        const results = await batchProcess(paths, null, options);
+
+        setImages((prev) =>
+          prev.map((item) => {
+            const idx = pending.findIndex((p) => p.id === item.id);
+            if (idx === -1) return item;
+            const result = results[idx];
+            return {
+              ...item,
+              result,
+              status: result?.success ? "done" : "error",
+            };
+          }),
+        );
+      } catch (error) {
         setImages((prev) =>
           prev.map((item) =>
-            item.id === img.id ? { ...item, status: "processing" } : item,
+            item.status === "processing"
+              ? {
+                  ...item,
+                  status: "error",
+                  result: {
+                    success: false,
+                    error: String(error),
+                    output_path: null,
+                    slices: [],
+                    base64: null,
+                  },
+                }
+              : item,
           ),
         );
-        setProgress({ current: i + 1, total: pending.length });
-
-        try {
-          const result = await processImage(img.path, null, options);
-          setImages((prev) =>
-            prev.map((item) =>
-              item.id === img.id
-                ? { ...item, result, status: result.success ? "done" : "error" }
-                : item,
-            ),
-          );
-        } catch (error) {
-          setImages((prev) =>
-            prev.map((item) =>
-              item.id === img.id
-                ? {
-                    ...item,
-                    status: "error",
-                    result: {
-                      success: false,
-                      error: String(error),
-                      output_path: null,
-                      slices: [],
-                      base64: null,
-                    },
-                  }
-                : item,
-            ),
-          );
-        }
       }
 
+      setProgress({ current: pending.length, total: pending.length });
       setProcessing(false);
     },
     [images],
@@ -102,7 +108,7 @@ export function useImageProcess() {
 
       setImages((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, status: "processing" } : item,
+          item.id === id ? { ...item, status: "processing" as const } : item,
         ),
       );
 
