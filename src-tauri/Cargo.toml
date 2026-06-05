@@ -1,0 +1,23 @@
+[package]
+name = "auto-cut-tool"
+version = "0.1.0"
+description = "AI-driven image cutting and background removal tool"
+authors = ["Auto Cut Tool"]
+edition = "2021"
+
+[lib]
+name = "auto_cut_tool_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+image = "0.25"
+base64 = "0.22"
+dirs = "5"
