@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { isAbsolute } from "@tauri-apps/api/path";
 
 export interface ProcessOptions {
   remove_bg: boolean;
@@ -33,11 +34,19 @@ export interface AppConfig {
   max_batch_size: number;
 }
 
+async function assertAbsolutePath(path: string, fieldName: string) {
+  if (!(await isAbsolute(path))) {
+    throw new Error(`${fieldName} must be an absolute filesystem path: ${path}`);
+  }
+}
+
 export async function processImage(
   inputPath: string,
   outputDir: string | null,
   options: ProcessOptions,
 ): Promise<ProcessResult> {
+  await assertAbsolutePath(inputPath, "inputPath");
+
   return invoke<ProcessResult>("process_image", {
     inputPath,
     outputDir,
@@ -50,6 +59,10 @@ export async function batchProcess(
   outputDir: string | null,
   options: ProcessOptions,
 ): Promise<ProcessResult[]> {
+  await Promise.all(
+    inputPaths.map((inputPath) => assertAbsolutePath(inputPath, "inputPath")),
+  );
+
   return invoke<ProcessResult[]>("batch_process", {
     inputPaths,
     outputDir,

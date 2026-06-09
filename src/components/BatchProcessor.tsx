@@ -3,7 +3,7 @@ import type { ProcessOptions } from "../lib/tauri";
 interface BatchProcessorProps {
   images: Array<{
     id: string;
-    file: File;
+    name: string;
     status: string;
     result?: { success: boolean; error?: string | null };
   }>;
@@ -161,7 +161,7 @@ export function BatchProcessor({
               >
                 <span className="text-sm text-gray-400 w-6">{idx + 1}</span>
                 <span className="text-sm text-gray-700 flex-1 truncate">
-                  {img.file.name}
+                  {img.name}
                 </span>
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full ${
