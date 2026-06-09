@@ -3,8 +3,8 @@ import { exportResults } from "../lib/tauri";
 
 interface ResultImage {
   id: string;
-  file: File;
-  preview: string;
+  name: string;
+  previewUrl: string;
   result?: {
     base64?: string | null;
     output_path?: string | null;
@@ -27,7 +27,7 @@ export function ResultsView({ images, selectedId, onSelect }: ResultsViewProps) 
     if (!img.result?.base64) return;
 
     const ext = img.result.output_path?.split(".").pop() || "png";
-    const name = img.file.name.replace(/\.[^.]+$/, `_processed.${ext}`);
+    const name = img.name.replace(/\.[^.]+$/, `_processed.${ext}`);
 
     try {
       await exportResults(img.result.base64, name, ext);
@@ -84,7 +84,7 @@ export function ResultsView({ images, selectedId, onSelect }: ResultsViewProps) 
             >
               <img
                 src={img.result!.base64!}
-                alt={img.file.name}
+                alt={img.name}
                 className="w-full h-24 object-contain bg-gray-50"
               />
 
@@ -117,7 +117,7 @@ export function ResultsView({ images, selectedId, onSelect }: ResultsViewProps) 
           </div>
           <div className="mt-3 space-y-1">
             <p className="text-xs text-gray-500 truncate">
-              文件: {selected.file.name}
+              文件: {selected.name}
             </p>
             {selected.result.output_path && (
               <p className="text-xs text-gray-500 truncate">

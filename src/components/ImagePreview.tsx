@@ -1,8 +1,8 @@
 interface ImagePreviewProps {
   images: Array<{
     id: string;
-    preview: string;
-    file: File;
+    previewUrl: string;
+    name: string;
     status: string;
     result?: {
       base64?: string | null;
@@ -47,8 +47,8 @@ export function ImagePreview({
             onClick={() => onSelect(img.id)}
           >
             <img
-              src={img.preview}
-              alt={img.file.name}
+              src={img.previewUrl}
+              alt={img.name}
               className="w-full h-20 object-cover"
             />
 
@@ -79,7 +79,7 @@ export function ImagePreview({
             )}
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1.5">
-              <p className="text-white text-xs truncate">{img.file.name}</p>
+              <p className="text-white text-xs truncate">{img.name}</p>
             </div>
           </div>
         ))}

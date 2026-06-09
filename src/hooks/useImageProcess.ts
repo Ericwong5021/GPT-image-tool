@@ -5,11 +5,19 @@ import {
   type ProcessResult,
 } from "../lib/tauri";
 
+export interface ImageImport {
+  /** Absolute filesystem path returned by Tauri dialog or drag/drop. */
+  path: string;
+  name: string;
+  previewUrl: string;
+}
+
 interface ImageFile {
   id: string;
-  file: File;
+  name: string;
+  /** Absolute filesystem path used only for the backend process_image command. */
   path: string;
-  preview: string;
+  previewUrl: string;
   result?: ProcessResult;
   status: "pending" | "processing" | "done" | "error";
 }
@@ -19,12 +27,12 @@ export function useImageProcess() {
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
 
-  const addImages = useCallback((files: File[]) => {
-    const newImages: ImageFile[] = files.map((file) => ({
+  const addImages = useCallback((imports: ImageImport[]) => {
+    const newImages: ImageFile[] = imports.map((image) => ({
       id: crypto.randomUUID(),
-      file,
-      path: (file as unknown as { path?: string }).path || file.name,
-      preview: URL.createObjectURL(file),
+      name: image.name,
+      path: image.path,
+      previewUrl: image.previewUrl,
       status: "pending" as const,
     }));
     setImages((prev) => [...prev, ...newImages]);
@@ -33,14 +41,16 @@ export function useImageProcess() {
   const removeImage = useCallback((id: string) => {
     setImages((prev) => {
       const img = prev.find((i) => i.id === id);
-      if (img) URL.revokeObjectURL(img.preview);
+      if (img?.previewUrl.startsWith("blob:")) URL.revokeObjectURL(img.previewUrl);
       return prev.filter((i) => i.id !== id);
     });
   }, []);
 
   const clearImages = useCallback(() => {
     setImages((prev) => {
-      prev.forEach((img) => URL.revokeObjectURL(img.preview));
+      prev.forEach((img) => {
+        if (img?.previewUrl.startsWith("blob:")) URL.revokeObjectURL(img.previewUrl);
+      });
       return [];
     });
   }, []);
