@@ -56,13 +56,21 @@ pub fn process_image(
 
     let out_dir = output_dir
         .or(config.output_dir.clone())
+        .map(PathBuf::from)
         .unwrap_or_else(|| {
             let mut p = PathBuf::from(&input_path);
             p.pop();
             p.push("output");
-            std::fs::create_dir_all(&p).ok();
-            p.to_string_lossy().to_string()
+            p
         });
+
+    std::fs::create_dir_all(&out_dir).map_err(|e| {
+        format!(
+            "Failed to create output directory '{}': {}",
+            out_dir.display(),
+            e
+        )
+    })?;
 
     let input_name = PathBuf::from(&input_path)
         .file_stem()
@@ -78,14 +86,14 @@ pub fn process_image(
     if options.auto_slice {
         let slices = img_proc::auto_slice(&result_img, config.slice_sensitivity);
         for (i, slice) in slices.iter().enumerate() {
-            let slice_path = format!("{}/{}_slice_{}.{}", out_dir, input_name, i, ext);
+            let slice_path = out_dir.join(format!("{}_slice_{}.{}", input_name, i, ext));
             let slice_encoded = img_proc::encode_image(slice, &options.output_format)?;
             std::fs::write(&slice_path, &slice_encoded).map_err(|e| e.to_string())?;
-            slice_paths.push(slice_path);
+            slice_paths.push(slice_path.to_string_lossy().to_string());
         }
     }
 
-    let output_path = format!("{}/{}_processed.{}", out_dir, input_name, ext);
+    let output_path = out_dir.join(format!("{}_processed.{}", input_name, ext));
     let encoded = img_proc::encode_image(&result_img, &options.output_format)?;
     std::fs::write(&output_path, &encoded).map_err(|e| e.to_string())?;
 
@@ -96,7 +104,7 @@ pub fn process_image(
 
     Ok(ProcessResult {
         success: true,
-        output_path: Some(output_path),
+        output_path: Some(output_path.to_string_lossy().to_string()),
         slices: slice_paths,
         base64: Some(format!("data:image/{};base64,{}", ext, base64)),
         error: None,
